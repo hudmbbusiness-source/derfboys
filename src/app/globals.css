@@ -1,26 +1,162 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Quantico:wght@400;700&display=swap');
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #0a0a0a;
+  --foreground: #ffffff;
+  --yellow: #FFB21A;
+  --red: #C81E2A;
+  --dark: #171330;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-yellow: var(--yellow);
+  --color-red: var(--red);
+  --color-dark: var(--dark);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Quantico', sans-serif;
+  overflow-x: hidden;
+}
+
+.arcade-btn {
+  position: relative;
+  display: inline-block;
+  padding: 16px 32px;
+  background: var(--yellow);
+  color: #000;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  border: 3px solid #000;
+  box-shadow: 6px 6px 0 var(--red);
+  transition: all 0.1s ease;
+  cursor: pointer;
+  font-family: 'Quantico', sans-serif;
+}
+
+.arcade-btn:hover {
+  transform: translate(2px, 2px);
+  box-shadow: 4px 4px 0 var(--red);
+}
+
+.arcade-btn:active {
+  transform: translate(6px, 6px);
+  box-shadow: 0px 0px 0 var(--red);
+}
+
+.arcade-btn-red {
+  background: var(--red);
+  color: #fff;
+  box-shadow: 6px 6px 0 var(--yellow);
+}
+
+.glow-text {
+  text-shadow: 0 0 10px var(--yellow), 0 0 20px var(--yellow), 0 0 40px var(--yellow);
+}
+
+.glow-red {
+  text-shadow: 0 0 10px var(--red), 0 0 20px var(--red), 0 0 40px var(--red);
+}
+
+@keyframes countPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+.counter-pulse {
+  animation: countPulse 2s ease-in-out infinite;
+}
+
+@keyframes flicker {
+  0%, 100% { opacity: 1; }
+  92% { opacity: 1; }
+  93% { opacity: 0.8; }
+  94% { opacity: 1; }
+}
+
+.flicker {
+  animation: flicker 4s infinite;
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.marquee {
+  animation: marquee 30s linear infinite;
+}
+
+.member-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border: 3px solid var(--yellow);
+}
+
+.member-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 0 30px rgba(255, 178, 26, 0.5), 0 0 60px rgba(255, 178, 26, 0.3);
+}
+
+.retro-border {
+  border: 3px solid var(--yellow);
+  box-shadow: 6px 6px 0 var(--red);
+}
+
+.section-divider {
+  height: 4px;
+  background: linear-gradient(90deg, transparent, var(--yellow), var(--red), var(--yellow), transparent);
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--dark);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--yellow);
+  border: 2px solid var(--dark);
+}
+
+.video-container {
+  position: relative;
+  padding-bottom: 56.25%;
+  height: 0;
+  overflow: hidden;
+}
+
+.video-container iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: 3px solid var(--yellow);
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.skeleton {
+  background: linear-gradient(90deg, #1a1a1a 25%, #2a2a2a 50%, #1a1a1a 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
 }
