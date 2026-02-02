@@ -96,7 +96,7 @@ function ContentCard({ title, platform, link, color, delay }: { title: string; p
 }
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
-  return <motion.h2 variants={fadeInUp} initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-4xl md:text-7xl font-bold text-center mb-16">{children}</motion.h2>;
+  return <motion.h2 variants={fadeInUp} initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-5xl md:text-8xl font-bold text-center mb-16" style={{ textShadow: "2px 2px 0 #000, 4px 4px 0 rgba(0,0,0,0.3)" }}>{children}</motion.h2>;
 }
 
 export default function Home() {
@@ -143,9 +143,9 @@ export default function Home() {
 
         <motion.div style={{ y: heroY, opacity: heroOpacity }} className="relative z-10 text-center px-4 max-w-5xl mx-auto">
           <motion.div initial={{ opacity: 0, scale: 0.5 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}>
-            <h1 className="text-6xl md:text-9xl font-bold tracking-tighter leading-none mb-8">
-              <motion.span className="text-[#FFB21A] glow-text inline-block" animate={{ textShadow: ["0 0 20px #FFB21A", "0 0 40px #FFB21A", "0 0 20px #FFB21A"] }} transition={{ duration: 2, repeat: Infinity }}>THE</motion.span><br />
-              <motion.span className="text-white inline-block" style={{ textShadow: "6px 6px 0 #C81E2A" }}>DERF BOYS</motion.span>
+            <h1 className="text-7xl md:text-[11rem] font-bold tracking-tighter leading-none mb-8">
+              <motion.span className="text-[#FFB21A] inline-block" style={{ textShadow: "2px 2px 0 #000, 4px 4px 0 #000, 6px 6px 0 rgba(255,178,26,0.4), 8px 8px 30px rgba(255,178,26,0.5)" }}>THE</motion.span><br />
+              <motion.span className="text-white inline-block" style={{ textShadow: "3px 3px 0 #C81E2A, 6px 6px 0 rgba(200,30,42,0.5), 9px 9px 0 rgba(0,0,0,0.5), 12px 12px 40px rgba(0,0,0,0.5)" }}>DERF BOYS</motion.span>
             </h1>
           </motion.div>
 
