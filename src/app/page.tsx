@@ -215,7 +215,7 @@ export default function Home() {
 
   const fetchFollowers = useCallback(async () => {
     try {
-      const r = await fetch("/api/followers");
+      const r = await fetch("/api/followers", { cache: 'no-store' });
       const d = await r.json();
       if (d.success) setFollowerData(d);
     } catch (e) {
