@@ -1,122 +1,44 @@
 import { NextResponse } from 'next/server';
 
-// Member data with Instagram usernames and YouTube channel IDs
+// Member data with accurate follower counts
+// Last updated: Update these periodically or when counts change significantly
 const MEMBERS = {
   jggls: {
-    instagram: "_jggls_",
-    tiktok: "jggls",
-    youtubeChannelId: "UC35TiyFAjzQCyOrFt5ccbhw", // JGGLS official
+    tiktok: 1800000,      // 1.8M TikTok
+    instagram: 176000,    // 176K Instagram
+    youtube: 2600000,     // 2.6M YouTube
+    profilePic: "/media/images/jggls.jpg",
   },
   huddy: {
-    instagram: "huddy_lg",
-    tiktok: "huddy_lg",
-    youtubeChannelId: "UCvMzLkT3jKpNL3RMEm2hTGg", // Huddy
+    tiktok: 2400,         // 2.4K TikTok
+    instagram: 1500,      // 1.5K Instagram
+    youtube: 1200,        // 1.2K YouTube
+    profilePic: "/media/images/huddy.jpg",
   },
   jvhn: {
-    instagram: "jvhnseo",
-    tiktok: "jvhnseo",
-    youtubeChannelId: "UCEcYThJPKqxw8DH7TE-IPFQ", // JvhnSeo
+    tiktok: 1090000,      // 1.09M TikTok
+    instagram: 190000,    // 190K Instagram
+    youtube: 1330000,     // 1.33M YouTube
+    profilePic: "/media/images/jvhn.jpg",
   },
   brandon: {
-    instagram: "brandondeluna_",
-    tiktok: "djfashionkill",
-    youtubeChannelId: null,
+    tiktok: 99000,        // 99K TikTok
+    instagram: 196000,    // 196K Instagram
+    youtube: 0,           // No YouTube
+    profilePic: "/media/images/brandon.jpg",
   },
 };
 
-async function fetchInstagramData(username: string): Promise<{ followers: number; profilePic: string | null }> {
-  try {
-    const res = await fetch(
-      `https://www.instagram.com/api/v1/users/web_profile_info/?username=${username}`,
-      {
-        headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-          'X-IG-App-ID': '936619743392459',
-        },
-        next: { revalidate: 300 },
-      }
-    );
-    if (!res.ok) return { followers: 0, profilePic: null };
-    const data = await res.json();
-    const user = data?.data?.user;
-    return {
-      followers: user?.edge_followed_by?.count || 0,
-      profilePic: user?.profile_pic_url_hd || user?.profile_pic_url || null,
-    };
-  } catch (e) {
-    console.error(`Instagram fetch error for ${username}:`, e);
-    return { followers: 0, profilePic: null };
-  }
-}
-
-async function fetchTikTokFollowers(username: string): Promise<number> {
-  try {
-    // Try TikTok's unofficial API
-    const res = await fetch(
-      `https://www.tiktok.com/api/user/detail/?uniqueId=${username}`,
-      {
-        headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-        },
-        next: { revalidate: 300 },
-      }
-    );
-    if (!res.ok) {
-      // Fallback to mixerno
-      const mixerRes = await fetch(`https://mixerno.space/api/tiktok-user-counter/user/${username}`, { next: { revalidate: 300 } });
-      if (mixerRes.ok) {
-        const mixerData = await mixerRes.json();
-        const f = mixerData?.counts?.find((c: any) => c.value === "followers");
-        if (f?.count) return parseInt(f.count, 10);
-      }
-      return 0;
-    }
-    const data = await res.json();
-    return data?.userInfo?.stats?.followerCount || 0;
-  } catch (e) {
-    console.error(`TikTok fetch error for ${username}:`, e);
-    return 0;
-  }
-}
-
-async function fetchYouTubeSubscribers(channelId: string | null): Promise<number> {
-  if (!channelId) return 0;
-  try {
-    const res = await fetch(
-      `https://api.socialcounts.org/youtube-live-subscriber-count/${channelId}`,
-      { next: { revalidate: 300 } }
-    );
-    if (!res.ok) return 0;
-    const data = await res.json();
-    return data?.counters?.api?.subscriberCount || data?.counters?.estimation?.subscriberCount || 0;
-  } catch (e) {
-    console.error(`YouTube fetch error for ${channelId}:`, e);
-    return 0;
-  }
-}
-
 export async function GET() {
   try {
-    const memberEntries = Object.entries(MEMBERS);
-
-    const results = await Promise.all(
-      memberEntries.map(async ([name, m]) => {
-        const [instagramData, tiktok, youtube] = await Promise.all([
-          fetchInstagramData(m.instagram),
-          fetchTikTokFollowers(m.tiktok),
-          fetchYouTubeSubscribers(m.youtubeChannelId),
-        ]);
-
-        return {
-          name,
-          instagram: instagramData.followers,
-          tiktok,
-          youtube,
-          total: instagramData.followers + tiktok + youtube,
-          profilePic: instagramData.profilePic,
-        };
-      })
-    );
+    const results = Object.entries(MEMBERS).map(([name, m]) => ({
+      name,
+      tiktok: m.tiktok,
+      instagram: m.instagram,
+      youtube: m.youtube,
+      total: m.tiktok + m.instagram + m.youtube,
+      profilePic: m.profilePic,
+    }));
 
     const totals = results.reduce(
       (acc, m) => ({
