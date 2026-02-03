@@ -117,6 +117,9 @@ const stagger = {
 export default function Home() {
   const [followerData, setFollowerData] = useState<any>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<'ideas' | 'collab'>('ideas');
+  const [formData, setFormData] = useState({ name: '', email: '', message: '', socialHandle: '', followerCount: '' });
+  const [formStatus, setFormStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
 
   const fetchFollowers = useCallback(async () => {
     try {
@@ -139,6 +142,42 @@ export default function Home() {
     if (n >= 1e6) return (n / 1e6).toFixed(1) + "M";
     if (n >= 1e3) return (n / 1e3).toFixed(1) + "K";
     return n.toLocaleString();
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setFormStatus('loading');
+
+    const subject = activeTab === 'ideas'
+      ? `Video Idea from ${formData.name}`
+      : `Collab Request from ${formData.name} (${formData.socialHandle})`;
+
+    const message = activeTab === 'ideas'
+      ? `VIDEO IDEA SUBMISSION\n\n${formData.message}`
+      : `COLLABORATION REQUEST\n\nSocial Handle: ${formData.socialHandle}\nFollower Count: ${formData.followerCount}\n\nMessage:\n${formData.message}`;
+
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          message,
+          subject
+        })
+      });
+
+      if (res.ok) {
+        setFormStatus('success');
+        setFormData({ name: '', email: '', message: '', socialHandle: '', followerCount: '' });
+        setTimeout(() => setFormStatus('idle'), 5000);
+      } else {
+        setFormStatus('error');
+      }
+    } catch {
+      setFormStatus('error');
+    }
   };
 
   return (
@@ -601,31 +640,170 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Contact Section */}
-      <section id="contact" className="py-24 bg-yellow-400">
-        <div className="max-w-4xl mx-auto px-6 text-center">
+      {/* Community Section */}
+      <section id="contact" className="py-24 bg-neutral-950">
+        <div className="max-w-4xl mx-auto px-6">
           <motion.div
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
             variants={fadeUp}
+            className="text-center mb-12"
           >
             <h2
-              className="text-6xl md:text-8xl text-black mb-6"
+              className="text-6xl md:text-8xl text-white mb-4"
               style={{ fontFamily: 'var(--font-heading)' }}
             >
-              LET'S WORK TOGETHER
+              JOIN THE <span className="text-yellow-400">COMMUNITY</span>
             </h2>
-            <p className="text-xl text-black/70 mb-10">
-              For business inquiries, collaborations, and sponsorships
+            <p className="text-white/50 text-lg">
+              Submit video ideas or apply to collaborate with us
             </p>
+          </motion.div>
+
+          {/* Tabs */}
+          <div className="flex justify-center gap-4 mb-10">
+            <button
+              onClick={() => setActiveTab('ideas')}
+              className={`px-6 py-3 font-bold uppercase tracking-wider transition-all duration-300 ${
+                activeTab === 'ideas'
+                  ? 'bg-yellow-400 text-black'
+                  : 'bg-white/5 text-white/60 hover:bg-white/10'
+              }`}
+            >
+              Submit Video Idea
+            </button>
+            <button
+              onClick={() => setActiveTab('collab')}
+              className={`px-6 py-3 font-bold uppercase tracking-wider transition-all duration-300 ${
+                activeTab === 'collab'
+                  ? 'bg-yellow-400 text-black'
+                  : 'bg-white/5 text-white/60 hover:bg-white/10'
+              }`}
+            >
+              Apply to Collab
+            </button>
+          </div>
+
+          {/* Form */}
+          <motion.form
+            onSubmit={handleSubmit}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="bg-neutral-900 rounded-2xl p-8 border border-white/5"
+          >
+            {formStatus === 'success' ? (
+              <div className="text-center py-12">
+                <div className="text-6xl mb-4">🎉</div>
+                <h3 className="text-2xl font-bold text-yellow-400 mb-2" style={{ fontFamily: 'var(--font-heading)' }}>
+                  {activeTab === 'ideas' ? 'IDEA SUBMITTED!' : 'APPLICATION SENT!'}
+                </h3>
+                <p className="text-white/60">We'll review it and get back to you soon.</p>
+              </div>
+            ) : (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                  <div>
+                    <label className="block text-white/60 text-sm font-semibold uppercase tracking-wider mb-2">
+                      Your Name
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      className="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-white/30 focus:border-yellow-400 focus:outline-none transition-colors"
+                      placeholder="John Doe"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-white/60 text-sm font-semibold uppercase tracking-wider mb-2">
+                      Email
+                    </label>
+                    <input
+                      type="email"
+                      required
+                      value={formData.email}
+                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                      className="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-white/30 focus:border-yellow-400 focus:outline-none transition-colors"
+                      placeholder="john@example.com"
+                    />
+                  </div>
+                </div>
+
+                {activeTab === 'collab' && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div>
+                      <label className="block text-white/60 text-sm font-semibold uppercase tracking-wider mb-2">
+                        Social Media Handle
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={formData.socialHandle}
+                        onChange={(e) => setFormData({ ...formData, socialHandle: e.target.value })}
+                        className="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-white/30 focus:border-yellow-400 focus:outline-none transition-colors"
+                        placeholder="@yourhandle"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-white/60 text-sm font-semibold uppercase tracking-wider mb-2">
+                        Follower Count
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={formData.followerCount}
+                        onChange={(e) => setFormData({ ...formData, followerCount: e.target.value })}
+                        className="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-white/30 focus:border-yellow-400 focus:outline-none transition-colors"
+                        placeholder="100K"
+                      />
+                    </div>
+                  </div>
+                )}
+
+                <div className="mb-6">
+                  <label className="block text-white/60 text-sm font-semibold uppercase tracking-wider mb-2">
+                    {activeTab === 'ideas' ? 'Your Video Idea' : 'Tell Us About Yourself'}
+                  </label>
+                  <textarea
+                    required
+                    rows={5}
+                    value={formData.message}
+                    onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                    className="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-white/30 focus:border-yellow-400 focus:outline-none transition-colors resize-none"
+                    placeholder={activeTab === 'ideas'
+                      ? "Describe your video idea... What should we do? Why would it be fun?"
+                      : "Tell us about your content, why you want to collaborate, and any ideas you have..."
+                    }
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={formStatus === 'loading'}
+                  className="w-full bg-yellow-400 text-black py-4 font-bold uppercase tracking-wider hover:bg-yellow-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {formStatus === 'loading' ? 'Submitting...' : activeTab === 'ideas' ? 'Submit Idea' : 'Apply Now'}
+                </button>
+
+                {formStatus === 'error' && (
+                  <p className="text-red-400 text-center mt-4">Something went wrong. Please try again.</p>
+                )}
+              </>
+            )}
+          </motion.form>
+
+          {/* Business Contact */}
+          <div className="text-center mt-12">
+            <p className="text-white/40 text-sm mb-3">For business inquiries & sponsorships:</p>
             <a
               href="mailto:derfboys@gmail.com"
-              className="inline-flex items-center gap-3 bg-black text-white px-10 py-5 font-bold text-lg uppercase tracking-wider hover:bg-neutral-900 transition-colors duration-300"
+              className="text-yellow-400 font-bold hover:text-yellow-300 transition-colors"
             >
               derfboys@gmail.com
             </a>
-          </motion.div>
+          </div>
         </div>
       </section>
 
