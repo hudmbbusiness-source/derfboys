@@ -282,3 +282,216 @@ a:focus-visible, button:focus-visible {
     3px 3px 0 #000,
     4px 4px 10px rgba(0,0,0,0.5);
 }
+
+/* Form Input Styles */
+input, textarea {
+  font-family: 'Quantico', sans-serif;
+}
+
+input::placeholder, textarea::placeholder {
+  color: #666;
+  opacity: 1;
+}
+
+input:focus, textarea:focus {
+  box-shadow: 0 0 0 2px rgba(255, 178, 26, 0.3);
+}
+
+/* Video Card Styles */
+.video-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.video-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+  z-index: 1;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.video-card:hover::before {
+  opacity: 1;
+}
+
+/* Testimonial Quote Animation */
+@keyframes quoteFloat {
+  0%, 100% { transform: translateY(0) rotate(-5deg); }
+  50% { transform: translateY(-5px) rotate(-3deg); }
+}
+
+.quote-mark {
+  animation: quoteFloat 3s ease-in-out infinite;
+}
+
+/* Contact Form Button States */
+.arcade-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Success/Error Message Animation */
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.message-animate {
+  animation: slideUp 0.3s ease-out;
+}
+
+/* Mobile Menu Styles */
+.mobile-menu-link {
+  position: relative;
+}
+
+.mobile-menu-link::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -4px;
+  width: 0;
+  height: 2px;
+  background: var(--yellow);
+  transition: width 0.3s ease;
+}
+
+.mobile-menu-link:hover::after {
+  width: 100%;
+}
+
+/* Parallax Video Enhancement */
+.hero-video {
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+/* Stat Card Hover Enhancement */
+.stat-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,178,26,0.1), transparent);
+  transition: left 0.5s ease;
+}
+
+.stat-card:hover::before {
+  left: 100%;
+}
+
+/* Loading Spinner */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+/* Image Hover Zoom */
+.image-zoom {
+  overflow: hidden;
+}
+
+.image-zoom img {
+  transition: transform 0.5s ease;
+}
+
+.image-zoom:hover img {
+  transform: scale(1.05);
+}
+
+/* Gradient Text Effect */
+.gradient-text {
+  background: linear-gradient(90deg, var(--yellow), var(--red));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Pulse Animation for CTA */
+@keyframes ctaPulse {
+  0%, 100% { box-shadow: 6px 6px 0 var(--red), 0 0 0 0 rgba(255,178,26,0.4); }
+  50% { box-shadow: 6px 6px 0 var(--red), 0 0 20px 5px rgba(255,178,26,0.2); }
+}
+
+.cta-pulse {
+  animation: ctaPulse 2s ease-in-out infinite;
+}
+
+/* Card Entrance Animation */
+@keyframes cardEntrance {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.card-animate {
+  animation: cardEntrance 0.6s ease-out forwards;
+}
+
+/* Smooth Scroll Offset for Fixed Header */
+html {
+  scroll-padding-top: 100px;
+}
+
+/* Enhanced Focus States */
+.arcade-btn:focus-visible {
+  outline: 3px solid var(--yellow);
+  outline-offset: 3px;
+}
+
+/* Video Play Button Hover */
+.play-button {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.play-button:hover {
+  box-shadow: 0 0 30px rgba(255,178,26,0.6);
+}
+
+/* Responsive Video */
+@media (max-width: 768px) {
+  .hero-video-container video {
+    object-position: center;
+  }
+}
+
+/* Glass Card Enhancement */
+.glass {
+  position: relative;
+  overflow: hidden;
+}
+
+.glass::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+}
