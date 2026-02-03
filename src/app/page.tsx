@@ -7,7 +7,7 @@ const MEMBERS = [
     name: "JGGLS",
     handle: "@jggls",
     apiName: "jggls",
-    instagramUsername: "_jggls_",
+    profileImage: "/media/images/jggls.jpg",
     socials: {
       tiktok: "https://www.tiktok.com/@jggls",
       instagram: "https://www.instagram.com/_jggls_/",
@@ -18,7 +18,7 @@ const MEMBERS = [
     name: "HUDDY",
     handle: "@huddy_lg",
     apiName: "huddy",
-    instagramUsername: "huddy_lg",
+    profileImage: "/media/images/huddy.jpg",
     socials: {
       tiktok: "https://www.tiktok.com/@huddy_lg",
       instagram: "https://www.instagram.com/huddy_lg/",
@@ -29,7 +29,7 @@ const MEMBERS = [
     name: "JVHN SEO",
     handle: "@jvhnseo",
     apiName: "jvhn",
-    instagramUsername: "jvhnseo",
+    profileImage: "/media/images/jvhn.jpg",
     socials: {
       tiktok: "https://www.tiktok.com/@jvhnseo",
       instagram: "https://www.instagram.com/jvhnseo/",
@@ -40,7 +40,7 @@ const MEMBERS = [
     name: "BRANDON",
     handle: "@djfashionkill",
     apiName: "brandon",
-    instagramUsername: "brandondeluna_",
+    profileImage: "/media/images/brandon.jpg",
     socials: {
       tiktok: "https://www.tiktok.com/@djfashionkill",
       instagram: "https://www.instagram.com/brandondeluna_/"
@@ -560,16 +560,24 @@ export default function Home() {
                 >
                   <div className="bg-neutral-900 rounded-2xl p-6 h-full border border-white/5 hover:border-yellow-400/30 transition-colors duration-300">
                     {/* Profile Picture */}
-                    <div className="w-24 h-24 rounded-full overflow-hidden mb-5 mx-auto ring-4 ring-yellow-400/20 group-hover:ring-yellow-400/50 transition-all duration-300">
+                    <div className="relative w-24 h-24 rounded-full overflow-hidden mb-5 mx-auto ring-4 ring-yellow-400/20 group-hover:ring-yellow-400/50 transition-all duration-300">
+                      {/* Fallback gradient with initial */}
+                      <div className="absolute inset-0 bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center">
+                        <span
+                          className="text-4xl text-black"
+                          style={{ fontFamily: 'var(--font-heading)' }}
+                        >
+                          {member.name[0]}
+                        </span>
+                      </div>
+                      {/* Profile image (covers fallback when loaded) */}
                       <img
-                        src={`https://unavatar.io/instagram/${member.instagramUsername}`}
+                        src={member.profileImage}
                         alt={member.name}
-                        className="w-full h-full object-cover"
+                        className="absolute inset-0 w-full h-full object-cover"
                         onError={(e) => {
-                          // Fallback to gradient with initial if image fails
                           const target = e.target as HTMLImageElement;
                           target.style.display = 'none';
-                          target.parentElement!.innerHTML = `<div class="w-full h-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center"><span class="text-4xl text-black font-bold">${member.name[0]}</span></div>`;
                         }}
                       />
                     </div>

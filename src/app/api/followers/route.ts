@@ -1,10 +1,11 @@
 import { NextResponse } from 'next/server';
 
+// Fallback values - update these with accurate counts
 const MEMBERS = {
-  huddy: { tiktok: "huddy_lg", instagram: "huddy_lg", youtube: "Huddy_lg", fallback: { tiktok: 2200, instagram: 1500, youtube: 500 } },
-  jvhn: { tiktok: "jvhnseo", instagram: "jvhnseo", youtube: "JvhnSeo", fallback: { tiktok: 1088000, instagram: 85000, youtube: 45000 } },
-  brandon: { tiktok: "djfashionkill", instagram: "brandondeluna_", youtube: null, fallback: { tiktok: 98800, instagram: 15000, youtube: 0 } },
-  jggls: { tiktok: "jggls", instagram: "_jggls_", youtube: "jgglsofficial", fallback: { tiktok: 1796000, instagram: 170000, youtube: 2600000 } },
+  huddy: { tiktok: "huddy_lg", instagram: "huddy_lg", youtube: "Huddy_lg", fallback: { tiktok: 2400, instagram: 1500, youtube: 1200 } },
+  jvhn: { tiktok: "jvhnseo", instagram: "jvhnseo", youtube: "JvhnSeo", fallback: { tiktok: 1090000, instagram: 190000, youtube: 1330000 } },
+  brandon: { tiktok: "djfashionkill", instagram: "brandondeluna_", youtube: null, fallback: { tiktok: 99000, instagram: 196000, youtube: 0 } },
+  jggls: { tiktok: "jggls", instagram: "_jggls_", youtube: "jgglsofficial", fallback: { tiktok: 1800000, instagram: 176000, youtube: 2600000 } },
 };
 
 async function fetchTikTok(user: string, fallback: number): Promise<number> {
