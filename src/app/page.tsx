@@ -6,6 +6,8 @@ const MEMBERS = [
   {
     name: "JGGLS",
     handle: "@jggls",
+    apiName: "jggls",
+    instagramUsername: "_jggls_",
     socials: {
       tiktok: "https://www.tiktok.com/@jggls",
       instagram: "https://www.instagram.com/_jggls_/",
@@ -15,6 +17,8 @@ const MEMBERS = [
   {
     name: "HUDDY",
     handle: "@huddy_lg",
+    apiName: "huddy",
+    instagramUsername: "huddy_lg",
     socials: {
       tiktok: "https://www.tiktok.com/@huddy_lg",
       instagram: "https://www.instagram.com/huddy_lg/",
@@ -24,6 +28,8 @@ const MEMBERS = [
   {
     name: "JVHN SEO",
     handle: "@jvhnseo",
+    apiName: "jvhn",
+    instagramUsername: "jvhnseo",
     socials: {
       tiktok: "https://www.tiktok.com/@jvhnseo",
       instagram: "https://www.instagram.com/jvhnseo/",
@@ -33,6 +39,8 @@ const MEMBERS = [
   {
     name: "BRANDON",
     handle: "@djfashionkill",
+    apiName: "brandon",
+    instagramUsername: "brandondeluna_",
     socials: {
       tiktok: "https://www.tiktok.com/@djfashionkill",
       instagram: "https://www.instagram.com/brandondeluna_/"
@@ -122,7 +130,8 @@ export default function Home() {
 
   useEffect(() => {
     fetchFollowers();
-    const interval = setInterval(fetchFollowers, 300000);
+    // Refresh every 60 seconds for live updates
+    const interval = setInterval(fetchFollowers, 60000);
     return () => clearInterval(interval);
   }, [fetchFollowers]);
 
@@ -353,7 +362,7 @@ export default function Home() {
         </section>
       )}
 
-      {/* Content Section */}
+      {/* Content Section - Official Derf Boys Only */}
       <section id="videos" className="py-24 bg-black">
         <div className="max-w-7xl mx-auto px-6">
           <motion.div
@@ -370,35 +379,25 @@ export default function Home() {
               OUR <span className="text-yellow-400">CONTENT</span>
             </h2>
             <p className="text-white/50 text-lg max-w-xl">
-              Follow us across all platforms
+              Follow the official Derf Boys accounts
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
             {[
-              {
-                platform: 'YouTube',
-                icon: YouTubeIcon,
-                handle: '@jgglsofficial',
-                link: 'https://www.youtube.com/@jgglsofficial',
-                color: 'from-red-600 to-red-700',
-                cta: 'Subscribe'
-              },
-              {
-                platform: 'TikTok',
-                icon: TikTokIcon,
-                handle: '@jggls',
-                link: 'https://www.tiktok.com/@jggls',
-                color: 'from-pink-500 to-violet-600',
-                cta: 'Follow'
-              },
               {
                 platform: 'Instagram',
                 icon: InstagramIcon,
                 handle: '@derfboys',
                 link: 'https://www.instagram.com/derfboys/',
-                color: 'from-orange-500 to-pink-600',
-                cta: 'Follow'
+                color: 'from-orange-500 via-pink-500 to-purple-600',
+              },
+              {
+                platform: 'TikTok',
+                icon: TikTokIcon,
+                handle: '@derfboys',
+                link: 'https://www.tiktok.com/@derfboys',
+                color: 'from-cyan-400 via-pink-500 to-red-500',
               },
             ].map((platform, index) => (
               <motion.a
@@ -410,20 +409,20 @@ export default function Home() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
-                className={`relative aspect-[4/3] rounded-2xl overflow-hidden group bg-gradient-to-br ${platform.color} p-8 flex flex-col justify-between`}
+                className={`relative aspect-[16/9] rounded-2xl overflow-hidden group bg-gradient-to-br ${platform.color} p-8 flex flex-col justify-between`}
               >
                 <div className="flex items-center justify-between">
-                  <platform.icon className="w-10 h-10 text-white" />
+                  <platform.icon className="w-12 h-12 text-white" />
                   <ArrowIcon className="w-6 h-6 text-white/60 group-hover:translate-x-1 group-hover:text-white transition-all" />
                 </div>
                 <div>
                   <h3
-                    className="text-4xl text-white mb-1"
+                    className="text-5xl text-white mb-1"
                     style={{ fontFamily: 'var(--font-heading)' }}
                   >
                     {platform.platform}
                   </h3>
-                  <p className="text-white/70 text-sm">{platform.handle}</p>
+                  <p className="text-white/80 text-lg font-medium">{platform.handle}</p>
                 </div>
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
               </motion.a>
@@ -512,63 +511,92 @@ export default function Home() {
             viewport={{ once: true }}
             variants={stagger}
           >
-            {MEMBERS.map((member, index) => (
-              <motion.div
-                key={member.handle}
-                variants={fadeUp}
-                className="group"
-              >
-                <div className="bg-neutral-900 rounded-2xl p-8 h-full border border-white/5 hover:border-yellow-400/30 transition-colors duration-300">
-                  <div className="w-20 h-20 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center mb-6">
-                    <span
-                      className="text-4xl text-black"
+            {MEMBERS.map((member) => {
+              const memberStats = followerData?.members?.find((m: any) => m.name === member.apiName);
+              return (
+                <motion.div
+                  key={member.handle}
+                  variants={fadeUp}
+                  className="group"
+                >
+                  <div className="bg-neutral-900 rounded-2xl p-6 h-full border border-white/5 hover:border-yellow-400/30 transition-colors duration-300">
+                    {/* Profile Picture */}
+                    <div className="w-24 h-24 rounded-full overflow-hidden mb-5 mx-auto ring-4 ring-yellow-400/20 group-hover:ring-yellow-400/50 transition-all duration-300">
+                      <img
+                        src={`https://unavatar.io/instagram/${member.instagramUsername}`}
+                        alt={member.name}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          // Fallback to gradient with initial if image fails
+                          const target = e.target as HTMLImageElement;
+                          target.style.display = 'none';
+                          target.parentElement!.innerHTML = `<div class="w-full h-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center"><span class="text-4xl text-black font-bold">${member.name[0]}</span></div>`;
+                        }}
+                      />
+                    </div>
+
+                    {/* Name & Handle */}
+                    <h3
+                      className="text-2xl text-white mb-1 text-center"
                       style={{ fontFamily: 'var(--font-heading)' }}
                     >
-                      {member.name[0]}
-                    </span>
+                      {member.name}
+                    </h3>
+                    <p className="text-white/40 text-sm mb-4 text-center">{member.handle}</p>
+
+                    {/* Individual Stats */}
+                    {memberStats && (
+                      <div className="text-center mb-5">
+                        <div
+                          className="text-2xl text-yellow-400"
+                          style={{ fontFamily: 'var(--font-heading)' }}
+                        >
+                          {formatNumber(memberStats.total)}
+                        </div>
+                        <div className="text-xs text-white/30 uppercase tracking-wider">Total Followers</div>
+                      </div>
+                    )}
+
+                    {/* Social Links */}
+                    <div className="flex justify-center gap-3">
+                      {member.socials.tiktok && (
+                        <a
+                          href={member.socials.tiktok}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-white/50 hover:bg-gradient-to-br hover:from-cyan-400 hover:to-pink-500 hover:text-white transition-all duration-300"
+                          title="TikTok"
+                        >
+                          <TikTokIcon className="w-5 h-5" />
+                        </a>
+                      )}
+                      {member.socials.instagram && (
+                        <a
+                          href={member.socials.instagram}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-white/50 hover:bg-gradient-to-br hover:from-orange-500 hover:to-pink-500 hover:text-white transition-all duration-300"
+                          title="Instagram"
+                        >
+                          <InstagramIcon className="w-5 h-5" />
+                        </a>
+                      )}
+                      {member.socials.youtube && (
+                        <a
+                          href={member.socials.youtube}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-white/50 hover:bg-red-600 hover:text-white transition-all duration-300"
+                          title="YouTube"
+                        >
+                          <YouTubeIcon className="w-5 h-5" />
+                        </a>
+                      )}
+                    </div>
                   </div>
-                  <h3
-                    className="text-3xl text-white mb-1"
-                    style={{ fontFamily: 'var(--font-heading)' }}
-                  >
-                    {member.name}
-                  </h3>
-                  <p className="text-white/40 text-sm mb-6">{member.handle}</p>
-                  <div className="flex gap-3">
-                    {member.socials.tiktok && (
-                      <a
-                        href={member.socials.tiktok}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-white/50 hover:bg-yellow-400 hover:text-black transition-all duration-300"
-                      >
-                        <TikTokIcon className="w-5 h-5" />
-                      </a>
-                    )}
-                    {member.socials.instagram && (
-                      <a
-                        href={member.socials.instagram}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-white/50 hover:bg-yellow-400 hover:text-black transition-all duration-300"
-                      >
-                        <InstagramIcon className="w-5 h-5" />
-                      </a>
-                    )}
-                    {member.socials.youtube && (
-                      <a
-                        href={member.socials.youtube}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-white/50 hover:bg-yellow-400 hover:text-black transition-all duration-300"
-                      >
-                        <YouTubeIcon className="w-5 h-5" />
-                      </a>
-                    )}
-                  </div>
-                </div>
-              </motion.div>
-            ))}
+                </motion.div>
+              );
+            })}
           </motion.div>
         </div>
       </section>
