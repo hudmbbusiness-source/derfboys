@@ -1,33 +1,6 @@
 "use client";
-import { useEffect, useState, useCallback, useRef } from "react";
-import { motion, useInView } from "framer-motion";
-
-// Animated counter hook
-function useCountUp(end: number, duration: number = 2000, startOnView: boolean = true) {
-  const [count, setCount] = useState(0);
-  const [hasStarted, setHasStarted] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-  const isInView = useInView(ref, { once: true, margin: "-100px" });
-
-  useEffect(() => {
-    if (startOnView && !isInView) return;
-    if (hasStarted) return;
-
-    setHasStarted(true);
-    const startTime = Date.now();
-    const timer = setInterval(() => {
-      const elapsed = Date.now() - startTime;
-      const progress = Math.min(elapsed / duration, 1);
-      // Ease out cubic
-      const easeOut = 1 - Math.pow(1 - progress, 3);
-      setCount(Math.floor(end * easeOut));
-      if (progress >= 1) clearInterval(timer);
-    }, 16);
-    return () => clearInterval(timer);
-  }, [end, duration, isInView, startOnView, hasStarted]);
-
-  return { count, ref };
-}
+import { useEffect, useState, useCallback } from "react";
+import { motion } from "framer-motion";
 
 const MEMBERS = [
   {
@@ -171,10 +144,8 @@ function Marquee({ children, speed = 30 }: { children: React.ReactNode; speed?: 
   );
 }
 
-// Animated stat component
+// Stat component with simple display
 function AnimatedStat({ value, label }: { value: number; label: string }) {
-  const { count, ref } = useCountUp(value, 2000);
-
   const formatNumber = (n: number) => {
     if (n >= 1e6) return (n / 1e6).toFixed(1) + "M";
     if (n >= 1e3) return (n / 1e3).toFixed(1) + "K";
@@ -182,17 +153,23 @@ function AnimatedStat({ value, label }: { value: number; label: string }) {
   };
 
   return (
-    <div ref={ref} className="text-center">
+    <motion.div
+      className="text-center"
+      initial={{ opacity: 0, scale: 0.5 }}
+      whileInView={{ opacity: 1, scale: 1 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.5 }}
+    >
       <div
         className="text-5xl md:text-7xl text-yellow-400 mb-2"
         style={{ fontFamily: 'var(--font-heading)' }}
       >
-        {formatNumber(count)}
+        {formatNumber(value)}
       </div>
       <div className="text-xs font-semibold text-white/40 uppercase tracking-widest">
         {label}
       </div>
-    </div>
+    </motion.div>
   );
 }
 
