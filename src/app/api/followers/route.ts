@@ -1,5 +1,8 @@
 import { NextResponse } from 'next/server';
 
+// Force dynamic rendering (no caching)
+export const dynamic = 'force-dynamic';
+
 // Member data with accurate follower counts
 // Last updated: Update these periodically or when counts change significantly
 const MEMBERS = {
@@ -50,12 +53,19 @@ export async function GET() {
       { tiktok: 0, instagram: 0, youtube: 0, total: 0 }
     );
 
-    return NextResponse.json({
-      success: true,
-      members: results,
-      totals,
-      timestamp: new Date().toISOString(),
-    });
+    return NextResponse.json(
+      {
+        success: true,
+        members: results,
+        totals,
+        timestamp: new Date().toISOString(),
+      },
+      {
+        headers: {
+          'Cache-Control': 'no-store, max-age=0',
+        },
+      }
+    );
   } catch (error) {
     console.error('Error fetching follower counts:', error);
     return NextResponse.json({ success: false, error: 'Failed to fetch counts' }, { status: 500 });
