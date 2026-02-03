@@ -3,6 +3,8 @@
 :root {
   --background: #000000;
   --foreground: #ffffff;
+  --font-heading: 'Bebas Neue', sans-serif;
+  --font-body: 'Inter', sans-serif;
 }
 
 * {
