@@ -1,6 +1,33 @@
 "use client";
-import { useEffect, useState, useCallback } from "react";
-import { motion } from "framer-motion";
+import { useEffect, useState, useCallback, useRef } from "react";
+import { motion, useInView } from "framer-motion";
+
+// Animated counter hook
+function useCountUp(end: number, duration: number = 2000, startOnView: boolean = true) {
+  const [count, setCount] = useState(0);
+  const [hasStarted, setHasStarted] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  const isInView = useInView(ref, { once: true, margin: "-100px" });
+
+  useEffect(() => {
+    if (startOnView && !isInView) return;
+    if (hasStarted) return;
+
+    setHasStarted(true);
+    const startTime = Date.now();
+    const timer = setInterval(() => {
+      const elapsed = Date.now() - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      // Ease out cubic
+      const easeOut = 1 - Math.pow(1 - progress, 3);
+      setCount(Math.floor(end * easeOut));
+      if (progress >= 1) clearInterval(timer);
+    }, 16);
+    return () => clearInterval(timer);
+  }, [end, duration, isInView, startOnView, hasStarted]);
+
+  return { count, ref };
+}
 
 const MEMBERS = [
   {
@@ -97,6 +124,75 @@ function ArrowIcon({ className = "w-5 h-5" }: { className?: string }) {
     <svg viewBox="0 0 24 24" className={`${className} fill-current`}>
       <path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/>
     </svg>
+  );
+}
+
+// Creator YouTube channels with subscriber counts
+const YOUTUBE_CHANNELS = [
+  {
+    name: "JGGLS",
+    handle: "@jgglsofficial",
+    url: "https://www.youtube.com/@jgglsofficial",
+    subscribers: "2.6M+",
+    description: "Comedy, Characters & Chaos",
+    gradient: "from-red-600 to-orange-500",
+  },
+  {
+    name: "JVHN SEO",
+    handle: "@JvhnSeo",
+    url: "https://www.youtube.com/@JvhnSeo",
+    subscribers: "1.33M+",
+    description: "Entertainment & Vlogs",
+    gradient: "from-purple-600 to-pink-500",
+  },
+  {
+    name: "HUDDY",
+    handle: "@Huddy_lg",
+    url: "https://www.youtube.com/@Huddy_lg",
+    subscribers: "1.2K+",
+    description: "Content & Comedy",
+    gradient: "from-blue-600 to-cyan-500",
+  },
+];
+
+// Marquee component
+function Marquee({ children, speed = 30 }: { children: React.ReactNode; speed?: number }) {
+  return (
+    <div className="overflow-hidden whitespace-nowrap">
+      <motion.div
+        className="inline-flex"
+        animate={{ x: ["0%", "-50%"] }}
+        transition={{ duration: speed, repeat: Infinity, ease: "linear" }}
+      >
+        {children}
+        {children}
+      </motion.div>
+    </div>
+  );
+}
+
+// Animated stat component
+function AnimatedStat({ value, label }: { value: number; label: string }) {
+  const { count, ref } = useCountUp(value, 2000);
+
+  const formatNumber = (n: number) => {
+    if (n >= 1e6) return (n / 1e6).toFixed(1) + "M";
+    if (n >= 1e3) return (n / 1e3).toFixed(1) + "K";
+    return n.toLocaleString();
+  };
+
+  return (
+    <div ref={ref} className="text-center">
+      <div
+        className="text-5xl md:text-7xl text-yellow-400 mb-2"
+        style={{ fontFamily: 'var(--font-heading)' }}
+      >
+        {formatNumber(count)}
+      </div>
+      <div className="text-xs font-semibold text-white/40 uppercase tracking-widest">
+        {label}
+      </div>
+    </div>
   );
 }
 
@@ -336,7 +432,7 @@ export default function Home() {
               href="https://www.youtube.com/@jgglsofficial"
               target="_blank"
               rel="noopener noreferrer"
-              className="group inline-flex items-center justify-center gap-3 bg-yellow-400 text-black px-8 py-4 font-bold uppercase tracking-wider hover:bg-yellow-300 transition-colors duration-300"
+              className="btn-glow group inline-flex items-center justify-center gap-3 bg-yellow-400 text-black px-8 py-4 font-bold uppercase tracking-wider hover:bg-yellow-300 transition-all duration-300 hover:scale-105"
             >
               <PlayIcon className="w-5 h-5" />
               Watch Videos
@@ -363,36 +459,42 @@ export default function Home() {
         </motion.div>
       </section>
 
+      {/* Marquee Banner */}
+      <section className="py-4 bg-yellow-400 overflow-hidden">
+        <Marquee speed={25}>
+          <span className="inline-flex items-center gap-8 text-black font-bold text-lg md:text-xl uppercase tracking-wider px-4">
+            <span>DO EVERYTHING REALLY FUN</span>
+            <span className="text-yellow-600">★</span>
+            <span>CONTENT CREATORS</span>
+            <span className="text-yellow-600">★</span>
+            <span>TIKTOK</span>
+            <span className="text-yellow-600">★</span>
+            <span>YOUTUBE</span>
+            <span className="text-yellow-600">★</span>
+            <span>INSTAGRAM</span>
+            <span className="text-yellow-600">★</span>
+            <span>ENTERTAINMENT</span>
+            <span className="text-yellow-600">★</span>
+            <span>COMEDY</span>
+            <span className="text-yellow-600">★</span>
+          </span>
+        </Marquee>
+      </section>
+
       {/* Stats Bar */}
       {followerData && (
-        <section className="py-16 bg-neutral-950 border-y border-white/5">
-          <div className="max-w-7xl mx-auto px-6">
-            <motion.div
-              className="grid grid-cols-2 md:grid-cols-4 gap-8"
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-              variants={stagger}
-            >
-              {[
-                { label: 'Total Followers', value: followerData.totals?.total },
-                { label: 'TikTok', value: followerData.totals?.tiktok },
-                { label: 'YouTube', value: followerData.totals?.youtube },
-                { label: 'Instagram', value: followerData.totals?.instagram },
-              ].map((stat) => (
-                <motion.div key={stat.label} variants={fadeUp} className="text-center">
-                  <div
-                    className="text-5xl md:text-6xl text-yellow-400 mb-2"
-                    style={{ fontFamily: 'var(--font-heading)' }}
-                  >
-                    {formatNumber(stat.value || 0)}
-                  </div>
-                  <div className="text-xs font-semibold text-white/40 uppercase tracking-widest">
-                    {stat.label}
-                  </div>
-                </motion.div>
-              ))}
-            </motion.div>
+        <section className="py-20 bg-neutral-950 border-y border-white/5 relative overflow-hidden">
+          {/* Gradient orbs */}
+          <div className="absolute top-0 left-1/4 w-96 h-96 bg-yellow-400/10 rounded-full blur-3xl" />
+          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-orange-500/10 rounded-full blur-3xl" />
+
+          <div className="max-w-7xl mx-auto px-6 relative">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+              <AnimatedStat value={followerData.totals?.total || 0} label="Total Followers" />
+              <AnimatedStat value={followerData.totals?.tiktok || 0} label="TikTok" />
+              <AnimatedStat value={followerData.totals?.youtube || 0} label="YouTube" />
+              <AnimatedStat value={followerData.totals?.instagram || 0} label="Instagram" />
+            </div>
           </div>
         </section>
       )}
@@ -466,8 +568,89 @@ export default function Home() {
         </div>
       </section>
 
+      {/* YouTube Channels Section */}
+      <section className="py-24 bg-neutral-950 relative overflow-hidden">
+        {/* Background effects */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(250,204,21,0.08),transparent_50%)]" />
+        <div className="absolute top-1/2 right-0 w-[500px] h-[500px] bg-red-500/10 rounded-full blur-3xl -translate-y-1/2" />
+
+        <div className="max-w-7xl mx-auto px-6 relative">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={fadeUp}
+            className="mb-12 text-center"
+          >
+            <h2
+              className="text-6xl md:text-8xl text-white mb-4"
+              style={{ fontFamily: 'var(--font-heading)' }}
+            >
+              WATCH ON <span className="text-red-500">YOUTUBE</span>
+            </h2>
+            <p className="text-white/50 text-lg">Subscribe to our channels</p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {YOUTUBE_CHANNELS.map((channel, index) => (
+              <motion.a
+                key={channel.handle}
+                href={channel.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 }}
+                className="group relative"
+              >
+                <div className={`aspect-[4/3] rounded-2xl overflow-hidden bg-gradient-to-br ${channel.gradient} p-6 flex flex-col justify-between relative`}>
+                  {/* Hover overlay */}
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300" />
+
+                  {/* Play button overlay */}
+                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <div className="w-20 h-20 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                      <PlayIcon className="w-10 h-10 text-white ml-1" />
+                    </div>
+                  </div>
+
+                  <div className="relative flex items-start justify-between">
+                    <YouTubeIcon className="w-10 h-10 text-white/90" />
+                    <div className="bg-black/30 backdrop-blur-sm px-3 py-1 rounded-full">
+                      <span className="text-white font-bold text-sm">{channel.subscribers}</span>
+                    </div>
+                  </div>
+
+                  <div className="relative">
+                    <h3
+                      className="text-4xl text-white mb-1"
+                      style={{ fontFamily: 'var(--font-heading)' }}
+                    >
+                      {channel.name}
+                    </h3>
+                    <p className="text-white/70 text-sm font-medium">{channel.handle}</p>
+                    <p className="text-white/50 text-xs mt-2">{channel.description}</p>
+                  </div>
+                </div>
+
+                {/* Subscribe button */}
+                <div className="mt-4 flex items-center justify-between">
+                  <span className="text-white/60 text-sm group-hover:text-white transition-colors">
+                    Watch latest videos
+                  </span>
+                  <span className="flex items-center gap-2 text-red-500 font-semibold text-sm group-hover:gap-3 transition-all">
+                    Subscribe <ArrowIcon className="w-4 h-4" />
+                  </span>
+                </div>
+              </motion.a>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* About Section */}
-      <section id="about" className="py-24 bg-neutral-950">
+      <section id="about" className="py-24 bg-black">
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <motion.div
@@ -554,7 +737,7 @@ export default function Home() {
                   variants={fadeUp}
                   className="group"
                 >
-                  <div className="bg-neutral-900 rounded-2xl p-6 h-full border border-white/5 hover:border-yellow-400/30 transition-colors duration-300">
+                  <div className="relative bg-neutral-900 rounded-2xl p-6 h-full border border-white/5 hover:border-yellow-400/50 transition-all duration-500 hover:shadow-[0_0_40px_rgba(250,204,21,0.15)]">
                     {/* Profile Picture */}
                     <div className="relative w-24 h-24 rounded-full overflow-hidden mb-5 mx-auto ring-4 ring-yellow-400/20 group-hover:ring-yellow-400/50 transition-all duration-300">
                       {/* Fallback gradient with initial */}
