@@ -2,13 +2,24 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-// Music playlist
+// Music playlist - all tracks
 const PLAYLIST = [
   { title: "Till I Collapse", artist: "Eminem", src: "/media/audio/till-i-collapse.mp3" },
   { title: "Thunderstruck", artist: "AC/DC", src: "/media/audio/thunderstruck.mp3" },
   { title: "Mo Bamba", artist: "Sheck Wes", src: "/media/audio/mo-bamba.mp3" },
   { title: "Black Beatles", artist: "Rae Sremmurd", src: "/media/audio/black-beatles.mp3" },
-  { title: "POWER", artist: "Kanye West", src: "/media/audio/power.mp3" },
+  { title: "Eye of the Tiger", artist: "Survivor", src: "/media/audio/eye-of-the-tiger.mp3" },
+  { title: "Forever", artist: "Drake, Kanye, Lil Wayne, Eminem", src: "/media/audio/forever.mp3" },
+  { title: "One Dance", artist: "Drake", src: "/media/audio/one-dance.mp3" },
+  { title: "Sunflower", artist: "Post Malone & Swae Lee", src: "/media/audio/sunflower.mp3" },
+  { title: "Niggas In Paris", artist: "JAY-Z & Kanye West", src: "/media/audio/niggas-in-paris.mp3" },
+  { title: "My Life Be Like", artist: "Grits ft. tobyMac", src: "/media/audio/my-life-be-like.mp3" },
+  { title: "See You Again", artist: "Wiz Khalifa ft. Charlie Puth", src: "/media/audio/see-you-again.mp3" },
+  { title: "Trap Queen", artist: "Fetty Wap", src: "/media/audio/trap-queen.mp3" },
+  { title: "Maui Wowie", artist: "Kid Cudi", src: "/media/audio/maui-wowie.mp3" },
+  { title: "Rocky Theme", artist: "Bill Conti", src: "/media/audio/rocky-theme.mp3" },
+  { title: "Timeless", artist: "Spider-Verse", src: "/media/audio/timeless.mp3" },
+  { title: "Now Or Never", artist: "TKANDZ", src: "/media/audio/now-or-never.mp3" },
 ];
 
 const MEMBERS = [
@@ -155,7 +166,7 @@ function VolumeIcon({ className = "w-5 h-5", muted = false }: { className?: stri
 
 // Floating Music Player Component
 function MusicPlayer() {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(true); // Start open to invite users to play
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTrack, setCurrentTrack] = useState(0);
   const [volume, setVolume] = useState(0.5);
@@ -191,46 +202,83 @@ function MusicPlayer() {
 
   const togglePlay = async () => {
     if (!audioRef.current) return;
-    if (isPlaying) {
-      audioRef.current.pause();
-    } else {
-      await audioRef.current.play();
+    try {
+      if (isPlaying) {
+        audioRef.current.pause();
+        setIsPlaying(false);
+      } else {
+        // Ensure audio is loaded
+        audioRef.current.load();
+        await audioRef.current.play();
+        setIsPlaying(true);
+      }
+    } catch (error) {
+      console.error('Playback error:', error);
+      // Try again after a brief moment
+      setTimeout(async () => {
+        try {
+          await audioRef.current?.play();
+          setIsPlaying(true);
+        } catch (e) {
+          console.error('Retry failed:', e);
+        }
+      }, 100);
     }
-    setIsPlaying(!isPlaying);
   };
 
-  const nextTrack = () => {
+  const nextTrack = async () => {
     const next = (currentTrack + 1) % PLAYLIST.length;
     setCurrentTrack(next);
     setProgress(0);
-    if (isPlaying && audioRef.current) {
+    if (audioRef.current) {
       audioRef.current.src = PLAYLIST[next].src;
-      audioRef.current.play();
+      audioRef.current.load();
+      if (isPlaying) {
+        try {
+          await audioRef.current.play();
+        } catch (e) {
+          console.error('Next track play error:', e);
+        }
+      }
     }
   };
 
-  const prevTrack = () => {
+  const prevTrack = async () => {
     const prev = currentTrack === 0 ? PLAYLIST.length - 1 : currentTrack - 1;
     setCurrentTrack(prev);
     setProgress(0);
-    if (isPlaying && audioRef.current) {
+    if (audioRef.current) {
       audioRef.current.src = PLAYLIST[prev].src;
-      audioRef.current.play();
+      audioRef.current.load();
+      if (isPlaying) {
+        try {
+          await audioRef.current.play();
+        } catch (e) {
+          console.error('Prev track play error:', e);
+        }
+      }
     }
   };
 
-  const selectTrack = (index: number) => {
+  const selectTrack = async (index: number) => {
     setCurrentTrack(index);
     setProgress(0);
     if (audioRef.current) {
       audioRef.current.src = PLAYLIST[index].src;
-      if (isPlaying) audioRef.current.play();
+      audioRef.current.load();
+      if (isPlaying) {
+        try {
+          await audioRef.current.play();
+        } catch (e) {
+          console.error('Select track play error:', e);
+        }
+      }
     }
   };
 
   return (
     <>
-      <audio ref={audioRef} src={PLAYLIST[currentTrack].src} />
+      <audio ref={audioRef} src={PLAYLIST[currentTrack].src} preload="auto" />
 
       {/* Floating Button */}
       <motion.div
