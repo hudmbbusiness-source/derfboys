@@ -7,7 +7,6 @@ const MEMBERS = [
     name: "JGGLS",
     handle: "@jggls",
     apiName: "jggls",
-    profileImage: "/media/images/jggls.jpg",
     socials: {
       tiktok: "https://www.tiktok.com/@jggls",
       instagram: "https://www.instagram.com/_jggls_/",
@@ -18,7 +17,6 @@ const MEMBERS = [
     name: "HUDDY",
     handle: "@huddy_lg",
     apiName: "huddy",
-    profileImage: "/media/images/huddy.jpg",
     socials: {
       tiktok: "https://www.tiktok.com/@huddy_lg",
       instagram: "https://www.instagram.com/huddy_lg/",
@@ -29,7 +27,6 @@ const MEMBERS = [
     name: "JVHN SEO",
     handle: "@jvhnseo",
     apiName: "jvhn",
-    profileImage: "/media/images/jvhn.jpg",
     socials: {
       tiktok: "https://www.tiktok.com/@jvhnseo",
       instagram: "https://www.instagram.com/jvhnseo/",
@@ -40,7 +37,6 @@ const MEMBERS = [
     name: "BRANDON",
     handle: "@djfashionkill",
     apiName: "brandon",
-    profileImage: "/media/images/brandon.jpg",
     socials: {
       tiktok: "https://www.tiktok.com/@djfashionkill",
       instagram: "https://www.instagram.com/brandondeluna_/"
@@ -570,16 +566,18 @@ export default function Home() {
                           {member.name[0]}
                         </span>
                       </div>
-                      {/* Profile image (covers fallback when loaded) */}
-                      <img
-                        src={member.profileImage}
-                        alt={member.name}
-                        className="absolute inset-0 w-full h-full object-cover"
-                        onError={(e) => {
-                          const target = e.target as HTMLImageElement;
-                          target.style.display = 'none';
-                        }}
-                      />
+                      {/* Profile image from Instagram API (covers fallback when loaded) */}
+                      {memberStats?.profilePic && (
+                        <img
+                          src={memberStats.profilePic}
+                          alt={member.name}
+                          className="absolute inset-0 w-full h-full object-cover"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.style.display = 'none';
+                          }}
+                        />
+                      )}
                     </div>
 
                     {/* Name & Handle */}
